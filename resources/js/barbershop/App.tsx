@@ -69,12 +69,23 @@ const STYLES: HaircutStyle[] = [
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    setIsLoggedIn(localStorage.getItem("barbershop_user") === "1");
+  }, []);
+
+  const handleLogout = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    localStorage.removeItem("barbershop_user");
+    window.location.href = "/login";
+  };
 
   const navLinks = [
     { name: 'Home', href: '#home' },
@@ -99,7 +110,7 @@ const Navbar = () => {
         </motion.div>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-6">
           {navLinks.map((link, i) => (
             <motion.a 
               key={link.name}
@@ -112,6 +123,47 @@ const Navbar = () => {
               {link.name}
             </motion.a>
           ))}
+          <motion.a
+            href="/profile"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: navLinks.length * 0.1 }}
+            className="text-sm font-semibold text-stone-700 hover:text-stone-900 transition-colors bg-stone-100 px-3 py-1.5 rounded-full"
+          >
+            Profil
+          </motion.a>
+          <motion.a
+            href="/"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: (navLinks.length + 1) * 0.1 }}
+            className="text-sm font-semibold text-stone-700 hover:text-stone-900 transition-colors bg-stone-200 px-3 py-1.5 rounded-full"
+          >
+            Logout
+          </motion.a>
+          {isLoggedIn && (
+            <motion.a
+              href="/profile"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: (navLinks.length + 2) * 0.1 }}
+              className="bg-stone-100 text-stone-800 px-4 py-2 rounded-full text-sm font-semibold hover:bg-stone-200 transition-all"
+            >
+              Profile
+            </motion.a>
+          )}
+          {isLoggedIn && (
+            <motion.a
+              href="/login"
+              onClick={handleLogout}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: (navLinks.length + 3) * 0.1 }}
+              className="bg-stone-200 text-stone-800 px-4 py-2 rounded-full text-sm font-semibold hover:bg-stone-300 transition-all"
+            >
+              Logout
+            </motion.a>
+          )}
           <motion.a 
             href="#contact"
             initial={{ opacity: 0, scale: 0.8 }}
@@ -150,6 +202,27 @@ const Navbar = () => {
                   {link.name}
                 </a>
               ))}
+              {isLoggedIn && (
+                <a
+                  href="/profile"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="text-stone-600 hover:text-stone-900 font-medium"
+                >
+                  Profil
+                </a>
+              )}
+              {isLoggedIn && (
+                <a
+                  href="/login"
+                  onClick={(e) => {
+                    setIsMenuOpen(false);
+                    handleLogout(e);
+                  }}
+                  className="text-stone-600 hover:text-stone-900 font-medium"
+                >
+                  Logout
+                </a>
+              )}
             </div>
           </motion.div>
         )}
